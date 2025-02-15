@@ -1,0 +1,8 @@
+{% extends 'mysite\base.html' %}  
+{% block content %}  
+<div class="container text-center" style="margin-top: 3%;">  
+    <h1>Oops! You’re not a seller yet.</h1>  <br>
+    <p>To start selling your products, you need to register as a seller.</p>  
+    <p><a href="{% url 'seller:newseller' %}" class="btn btn-primary">Become a seller</a></p>  
+</div>  
+{% endblock %}

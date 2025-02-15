@@ -1,0 +1,46 @@
+{% extends 'mysite/base.html' %}
+
+{% block content %}
+  <div style="background-color: #d2c9ff; min-height: calc(100vh - 6.80vh);">
+    <br> <br>
+    <div class="container" style="background: #f7f7ff; border-radius: 15px; padding: 20px;">
+      <h1 style="text-align: center;">Your Products</h1>
+      <div class="row">
+        {% if products %}
+
+        {% for product in products %}
+          <div class="col-md-3 mb-4">
+            <div class="card" style="border-radius: 15px; background-color: #ffffff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+              <img src="{{ product.image }}" width="250px" height="300px" class="card-img-top" style="border-radius: 15px 15px 0 0;">
+              <div class="card-body" style="border-radius: 0 0 15px 15px;">
+                <div class="card-title" style="font-size: larger; font-weight: 600;">
+                  {{ product.name }}
+                </div>
+                {% if product.discount_price is not None %}
+                  <div class="card-text">
+                    <s style="color: gray; font-size: large;">${{ product.price|floatformat:2 }}</s>
+                    <span style="color: green; font-size: large;">${{ product.discount_price|floatformat:2 }}</span>
+                  </div>
+                {% else %}
+                  <div class="card-text" style="color: green; font-size: large;">
+                    ${{ product.price|floatformat:2 }}
+                  </div>
+                {% endif %}
+                <div style="text-align: center;">
+                  <a href="/{{ product.id }}" class="btn btn-primary" style="border-radius: 10px;">Detail</a>
+                  <a href="{% url 'seller:edit_product' product.id %}" class="btn btn-info" style="border-radius: 10px; margin-left: 10px;">Edit</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+                  
+        {% else %}
+        <h4>
+          <br><p style="text-align: center;">You don't have any products for sale yet; you can sell them here <a href="{% url 'seller:addproducts' %}" style="text-decoration: none;">Sell products</a></p></h4>
+        {% endif %}
+      </div>
+    </div>
+    <br> <br>
+  </div>
+{% endblock %}

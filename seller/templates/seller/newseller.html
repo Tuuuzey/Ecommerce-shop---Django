@@ -1,0 +1,60 @@
+{% extends 'mysite\base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .phone-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 6.80vh);
+      background-color: #d2c9ff;
+      padding: 20px;
+  }
+
+  .phone-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+  }
+
+  .phone-card h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+  }
+
+  .btn-custom {
+      background-color: #28a745;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+      width: 100%;
+  }
+
+  .btn-custom:hover {
+      background-color: #218838;
+  }
+</style>
+
+<div class="phone-container">
+    <div class="phone-card">
+        <h2>Add phone number to your account</h2>
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label class="form-label">Phone number</label>
+                <input type="number" class="form-control" name="phone_number" required />
+            </div>
+
+            <button type="submit" class="btn btn-custom">Become a seller</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

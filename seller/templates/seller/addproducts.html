@@ -1,0 +1,86 @@
+{% extends 'mysite/base.html' %}
+
+{% block content %}
+<div style="background-color: #d2c9ff; min-height: calc(100vh - 6.80vh);">
+    <section class="h-custom" style="display: flex; justify-content: center; align-items: center;">
+        <div class="container py-5 d-flex justify-content-center align-items-center">
+            <div class="card card-registration card-registration-2" style="border-radius: 15px; width: 100%; max-width: 800px;">
+                <div class="card-body p-5">
+                    <h1 class="fw-bold text-center mb-4">Sell Product</h1>
+                    <hr class="my-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Product Name:</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price:</label>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description:</label>
+                            <textarea class="form-control" id="description" name="description" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Image URL (Main Image):</label>
+                            <input type="text" class="form-control" id="image" name="image" required>
+                        </div>
+
+                        <div id="additional_images_container"></div>
+                        
+                        <div class="mb-3 text-center">
+                            <button type="button" class="btn btn-info" id="add_image_field">Add Another Image</button>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category:</label>
+                            <select class="form-control" id="category" name="category" required>
+                                <option value="" selected disabled>-- Select Category --</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="fashion">Fashion & Clothing</option>
+                                <option value="home_garden">Home & Garden</option>
+                                <option value="health_beauty">Health & Beauty</option>
+                                <option value="toys">Toys & Kids</option>
+                                <option value="sports">Sports & Recreation</option>
+                                <option value="automotive">Automotive</option>
+                                <option value="supermarket">Supermarket</option>
+                                <option value="books">Books & Media</option>
+                                <option value="pets">Pets</option>
+                                <option value="office_school">Office & School Supplies</option>
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-dark btn-lg">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+const maxImages = 8;
+let imageCount = 0;
+
+$('#add_image_field').on('click', function() {
+    if (imageCount < maxImages) {
+        $('#additional_images_container').append(`
+            <div class="mb-3">
+                <label class="form-label">Additional Image URL:</label>
+                <input type="text" class="form-control" name="additional_images" placeholder="Enter image URL">
+            </div>
+        `);
+        imageCount++;
+    } else {
+        alert("You can add a maximum of 8 additional images.");
+    }
+});
+</script>
+{% endblock %}

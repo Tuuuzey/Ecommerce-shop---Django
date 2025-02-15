@@ -1,0 +1,11 @@
+{% extends 'mysite\base.html'%}
+{% block content %}
+
+<div class="container" style="text-align: center;">
+    <p><h1>Thank you for your order!</h1></p>
+    <p>The payment was successful</p>
+    <p>Now you can see your order in your profile in tab orders</p>
+    <p><a href="{% url 'orders' %}" class="btn btn-primary">ORDERS</a></p>
+</div>
+
+{% endblock %}

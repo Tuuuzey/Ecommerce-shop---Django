@@ -1,0 +1,121 @@
+{% extends 'mysite/base.html' %}
+{% block content %}
+<div style="background-color: #d2c9ff; min-height: calc(100vh - 6.80vh);">
+  <br> <br>
+  <div class="container" style="background: #f7f7ff; border-radius: 15px; padding: 20px;">
+    <h1>Edit Product</h1>
+    <div class="row">
+      <!-- Left Column: Product Images -->
+      <div class="col-md-6">
+        <!-- Main Image -->
+        <img src="{{ product.image }}" alt="{{ product.name }}" class="img-fluid rounded mb-3 product-image" id="mainImage" data-bs-toggle="modal" data-bs-target="#imageModal">
+        
+        <div class="d-flex justify-content-between mt-3">
+            {% for image in product.images.all %}
+                <img src="{{ image.image_url }}" alt="Thumbnail" class="thumbnail rounded {% if forloop.first %}active{% endif %}" onclick="changeImage(event, '{{ image.image_url }}')" style="height: 10%; width: 10%" data-bs-toggle="modal" data-bs-target="#imageModal">
+            {% endfor %}
+        </div>
+        
+        <div class="mb-3 text-center mt-3">
+          <button type="button" class="btn btn-info" id="add_image_field">Add Another Image</button>
+        </div>
+        
+        <div id="additional_images_container">
+          {% for image in product.images.all %}
+            <div class="mb-3">
+              <label class="form-label">Additional Image URL:</label>
+              <input type="text" class="form-control" name="additional_images" placeholder="Enter image URL" value="{{ image.image_url }}">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right Column: Product Form -->
+      <div class="col-md-6">
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="product_name" class="form-label">Product Name:</label>
+            <input type="text" class="form-control" id="product_name" name="name" value="{{ product.name }}">
+          </div>
+          
+          <div class="mb-3">
+            <label for="price" class="form-label">Price:</label>
+            <input type="text" class="form-control" id="price" name="price" value="{{ product.price }}">
+          </div>
+
+          <div class="mb-3">
+            <label for="discount_price" class="form-label">Discount Price:</label>
+            <input type="text" class="form-control" id="discount_price" name="discount_price" value="{{ product.discount_price }}">
+          </div>
+
+          <div class="mb-3">
+            <label for="category" class="form-label">Category:</label>
+            <input type="text" class="form-control" id="category" name="category" value="{{ product.get_category_display }}">
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description:</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ product.description }}</textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+        
+        <a href="{% url 'seller:sellers_prods' %}" class="btn btn-secondary mt-3">Back to Products</a>
+      </div>
+    </div>
+    
+    <script>
+      const maxImages = 8;
+      let imageCount = {{ product.images.all|length }};
+      
+      $('#add_image_field').on('click', function() {
+        if (imageCount < maxImages) {
+          $('#additional_images_container').append(`
+            <div class="mb-3">
+              <label class="form-label">Additional Image URL:</label>
+              <input type="text" class="form-control" name="additional_images" placeholder="Enter image URL">
+            </div>
+          `);
+          imageCount++;
+        } else {
+          alert("You can add a maximum of 8 additional images.");
+        }
+      });
+
+      function changeImage(event, newSrc) {
+        document.getElementById('mainImage').src = newSrc;
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach(function(thumbnail) {
+            thumbnail.classList.remove('active');
+        });
+        event.target.classList.add('active');
+      }
+      document.querySelectorAll('.thumbnail, #mainImage').forEach(image => {
+          image.addEventListener('click', function() {
+              const imageUrl = this.src;
+              const modalImage = document.getElementById('modalImage');
+              modalImage.src = imageUrl;
+          });
+      });
+    </script>
+
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img id="modalImage" src="" class="img-fluid" alt="Preview">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <br> <br>
+</div>
+{% endblock %}

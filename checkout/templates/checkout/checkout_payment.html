@@ -1,0 +1,101 @@
+{% extends 'mysite/base.html' %}
+{% load customfilters %}
+{% block content %}
+<div class="container d-flex flex-column align-items-center text-center" style="margin-top: 3%;">
+    <div style="width: 50%;">
+        <h1>Payment Confirmation</h1>
+        <br>
+        {% if new_total is None %}
+            <p><strong>Total:</strong> ${{ total|floatformat:2 }}</p>
+        {% else %}
+            <p><strong>Total:</strong> <span style="text-decoration: line-through;">${{ total }}</span>, ${{ new_total }} </p>
+            <p><strong>With code: </strong>{{ promo_code }}</p>
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            {% if payment == 'paypal' %}
+                <input type="submit" class="btn btn-primary" name="paystripe" value="Pay with PayPal" style="font-size: large;"></input>
+            {% elif payment == 'stripe' %}
+                <input type="submit" class="btn btn-dark" name="paypaypal" value="Pay with Stripe" style="font-size: large;"></input>
+            {% else %}
+                {{ payment }}
+            {% endif %}
+        </form>
+    </div>
+    <hr class="mb-4" style="width: 50%;"> 
+    <br>
+    <ul class="list-group mb-3" style="width: 50%;">
+        {% if prods %}
+            {% for prod in prods %}
+                {% with qty=qty|get_item:prod.id|default:1 %}
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">{{ prod.name }}</h6>
+                        </div>
+                        <span class="text-muted">
+                            {% if prod.discount_price is not None %}
+                                ${{ prod.discount_price|floatformat:2 }}
+                                {% if qty > 1 %}
+                                    x{{ qty }} ({{ prod.discount_price|floatformat:2|mul:qty }}$)
+                                {% endif %}
+                            {% else %}
+                                    ${{ prod.price|floatformat:2 }}
+                                    {% if qty > 1 %}
+                                        x{{ qty }} ({{ prod.price|floatformat:2|mul:qty }}$)
+                                    {% endif %}
+                            {% endif %}
+                        </span>
+                    </li>
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </ul> 
+    <hr class="mb-4" style="width: 75%;">
+    <ul class="list-group" style="width: 75%;">
+         <div class="col-md-8 order-md-1 mx-auto">
+            <li class="list-group-item">
+                <h4 class="mb-3">Billing address</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName">First name</label>
+                        <input type="text" class="form-control text-center" id="idfirstName" value="{{ new_address.first_name }}" name="first_name" disabled>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName">Last name</label>
+                        <input type="text" class="form-control text-center" id="idlastName" value="{{ new_address.last_name }}" name="last_name" disabled>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control text-center" id="idemail" name="email" value="{{ new_address.email }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="phone_number">Phone number</label>
+                    <input type="number" class="form-control text-center" id="idphone_number" name="phone_number" min="1000000" max="999999999999999" value="{{ new_address.phone_number }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="address">Address</label>
+                    <input type="text" class="form-control text-center" id="idaddress" name="address_input" value="{{ new_address.address }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="country">Country</label>
+                    <input type="text" class="form-control text-center" id="idcountry" name="country_input" value="{{ new_address.country }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="state">State</label>
+                    <input type="text" class="form-control text-center" id="idstate" name="state_input" value="{{ new_address.state }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="city">City</label>
+                    <input type="text" class="form-control text-center" id="idcity" name="city_input" value="{{ new_address.city }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="zip">Zip</label>
+                    <input type="text" class="form-control text-center" id="idzip" name="zip_input" value="{{ new_address.zip }}" disabled>
+                </div>
+                <hr class="mb-4">
+            </li>
+        </div>
+    </ul>
+</div>
+{% endblock %}

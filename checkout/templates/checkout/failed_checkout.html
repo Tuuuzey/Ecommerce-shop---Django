@@ -1,0 +1,12 @@
+{% extends 'mysite/base.html' %}
+{% block content %}
+
+<div class="container" style="text-align: center;">
+    <p><h1>Oops! Something went wrong with your order.</h1></p>
+    <p>The payment was not successful. Please try again or contact support.</p>
+    <p>Feel free to go back to the shop or your profile for further action.</p>
+    <p><a href="{% url 'index' %}" class="btn btn-danger">BACK TO SHOP</a></p>
+    <p><a href="{% url 'profile' %}" class="btn btn-primary">PROFILE</a></p>
+</div>
+
+{% endblock %}
