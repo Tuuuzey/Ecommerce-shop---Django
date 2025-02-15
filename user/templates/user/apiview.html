@@ -1,0 +1,27 @@
+{% extends 'mysite\base.html' %}
+{% block content %}
+<div class="container">
+    <h1>API Endpoints Overview</h1>
+
+    <ul>
+        <li>
+            <a href="{% url 'schema' %}">
+                <strong>API Schema</strong>
+            </a> - 
+            <em>This is the URL that provides the OpenAPI schema in JSON format. <strong>Clicking this link will download the schema as a file named schema.yaml.</strong></em>
+        </li>
+        <li>
+            <a href="{% url 'swagger-ui' %}">
+                <strong>Swagger UI</strong>
+            </a> - 
+            <em>This URL leads to the Swagger UI interface</em>
+        </li>
+        <li>
+            <a href="{% url 'redoc' %}">
+                <strong>Redoc</strong>
+            </a> - 
+            <em>This URL provides access to the Redoc interface</em>
+        </li>
+    </ul>
+</div>
+{% endblock %}

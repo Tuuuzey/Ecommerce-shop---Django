@@ -1,0 +1,22 @@
+{% extends 'mysite\base.html' %}
+
+{% block content %}
+    <h2>Leave a comment for your purchased products</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="productSelect" class="form-label">Select Product</label>
+            <select class="form-select" name="product" id="productSelect" required>
+                {% for item in order_items %}
+                    <option value="{{ item.product.id }}">{{ item.product.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <textarea class="form-control" name="content" rows="4" placeholder="Write your comment here..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+    </form>
+{% endblock %}

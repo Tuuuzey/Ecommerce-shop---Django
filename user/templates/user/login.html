@@ -1,0 +1,88 @@
+{% extends 'mysite\base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 6.80vh);
+      background-color: #d2c9ff;
+      padding: 20px;
+  }
+
+  .login-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+  }
+
+  .login-card h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+  }
+
+  .btn-custom {
+      background-color: #28a745;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+      width: 100%;
+  }
+
+  .btn-custom:hover {
+      background-color: #218838;
+  }
+
+  .text-muted a {
+      font-weight: bold;
+      text-decoration: underline;
+  }
+
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <h2>Login</h2>
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" required />
+            </div>
+
+            <button type="submit" class="btn btn-custom">Login</button>
+
+            <p class="text-center text-muted mt-4">
+                Haven't created an account yet? 
+                <a href="{% url 'register' %}" class="text-body">Register here</a>
+            </p>
+            <p class="text-center text-muted mt-4">
+                Forgot a password?
+                <a href="{% url 'user:forgot_password' %}" class="text-body">Reset your password</a>
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <p class="text-center text-danger fw-bold">{{ message }}</p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{% endblock %}

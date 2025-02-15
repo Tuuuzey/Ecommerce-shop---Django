@@ -1,0 +1,101 @@
+{% extends 'mysite\base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .register-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 6.80vh);
+      background-color: #d2c9ff;
+      padding: 20px;
+  }
+
+  .register-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 450px;
+      width: 100%;
+  }
+
+  .register-card h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+  }
+
+  .btn-custom {
+      background-color: #28a745;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+      width: 100%;
+  }
+
+  .btn-custom:hover {
+      background-color: #218838;
+  }
+
+  .text-muted a {
+      font-weight: bold;
+      text-decoration: underline;
+  }
+
+</style>
+
+<div class="register-container">
+    <div class="register-card">
+        <h2>Create an account</h2>
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" name="password1" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Confirm your password</label>
+                <input type="password" class="form-control" name="password2" required />
+            </div>
+
+            <div class="form-check d-flex justify-content-center mb-4">
+                <input class="form-check-input me-2" type="checkbox" required />
+                <label class="form-check-label">
+                    I agree to the <a href="{% url 'tos' %}" class="text-body"><u>Terms of Service</u></a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-custom">Register</button>
+
+            <p class="text-center text-muted mt-4">
+                Already have an account? 
+                <a href="{% url 'login' %}" class="text-body">Login here</a>
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <p class="text-center text-danger fw-bold">{{ message }}</p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{% endblock %}

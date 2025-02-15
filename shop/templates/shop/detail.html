@@ -1,0 +1,191 @@
+{% extends 'mysite/base.html' %}
+{% load customfilters %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<div style="margin-left: 25%; width: 50%; text-align: center;">
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success" role="alert"><span style="font-size: larger;">{{ message }}</span></div>
+    {% endfor %}
+{% endif %}
+</div>
+
+<script>
+    setTimeout(function() {
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.classList.remove('show'); 
+            alert.classList.add('fade'); 
+            setTimeout(() => alert.remove(), 500); 
+        });
+    }, 3000);
+</script>
+
+<div class="container mt-5">
+
+    <div class="row">
+    <!-- Product Images -->
+    <div class="col-md-6 mb-4">
+        <!-- Main Image -->
+        <img src="{{ product.image }}" alt="{{ product.name }}" class="img-fluid rounded mb-3 product-image" id="mainImage" data-bs-toggle="modal" data-bs-target="#imageModal">
+        
+        <div class="d-flex justify-content-between mt-3">
+            {% for image in product.images.all %}
+                <img src="{{ image.image_url }}" alt="Thumbnail" class="thumbnail rounded {% if forloop.first %}active{% endif %}" onclick="changeImage(event, '{{ image.image_url }}')" style="height: 10%; width: 10%" data-bs-toggle="modal" data-bs-target="#imageModal">
+            {% endfor %}
+        </div>
+    </div>
+
+        <script>
+            function changeImage(event, newSrc) {
+                document.getElementById('mainImage').src = newSrc;
+                const thumbnails = document.querySelectorAll('.thumbnail');
+                thumbnails.forEach(function(thumbnail) {
+                    thumbnail.classList.remove('active');
+                });
+                event.target.classList.add('active');
+            }
+            document.querySelectorAll('.thumbnail, #mainImage').forEach(image => {
+                image.addEventListener('click', function() {
+                    const imageUrl = this.src;
+                    const modalImage = document.getElementById('modalImage');
+                    modalImage.src = imageUrl;
+                });
+            });
+        </script>
+
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                  <img id="modalImage" src="" class="img-fluid" alt="Preview">
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <h2 class="mb-3">{{ product.name }}</h2>
+            <div class="mb-3">
+                {% if product.discount_price %}
+                    <span class="h4 me-2">${{ product.discount_price|floatformat:2 }}</span>
+                    <span class="text-muted"><s>${{ product.price|floatformat:2 }}</s></span>
+                {% else %}
+                    <span class="h4">${{ product.price|floatformat:2 }}</span>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+            {% if product.rating_count == 0 %}
+                <span class="ms-2">0</span>
+            {% else %}
+                <span class="ms-2">{{ product.rating_count }}</span>
+            {% endif %}
+
+            {% for i in 1|to:full_stars %}
+                <i class="bi bi-star-fill text-warning"></i>
+            {% endfor %}
+            
+            {% if half_star %}
+                <i class="bi bi-star-half text-warning"></i>
+            {% endif %}
+            
+            {% for i in 1|to:empty_stars %}
+                <i class="bi bi-star text-muted"></i>
+            {% endfor %}
+
+            </div>
+            <p class="mb-4">{{ product.description }}</p>
+            <div class="mb-4">
+                <h5>Category:</h5>
+                <span>{{ product.get_category_display  }}</span>
+            </div>
+            <div class="mb-4">
+                <label for="quantity" class="form-label">Quantity:</label>
+                <input type="number" class="form-control" id="quantity" value="1" min="1" style="width: 80px;">
+            </div>
+
+            {% if user.is_authenticated %}
+                <button class="btn btn-primary btn-lg mb-3 me-2 add-to-cart" data-prod-id="{{ product.id }}" data-prod-qty="1">
+                    <i class="bi bi-cart-plus"></i> Add to Cart
+                </button>
+                <a href="{% url 'wishlist:add_to_wishlist' product.id %}" class="btn btn-outline-secondary btn-lg mb-3">
+                    <i class="bi bi-heart"></i> Add to Wishlist
+                </a>
+            {% endif %}
+            <h2>Customer Reviews:</h2>
+
+            {% if comments %}
+                <ul>
+                    {% for comment in comments %}
+                        <li>
+                            <strong>{{ comment.user.username }}</strong>
+                            <div>
+                                {% if comment.rating %}
+                                    {% for i in 1|to:5 %}
+                                        {% if i <= comment.rating %}
+                                            <span>★</span>
+                                        {% elif i == comment.rating|add:0.5 %}
+                                            <span>☆</span>
+                                        {% else %}
+                                            <span>☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span>No rating</span>
+                                {% endif %}
+                            </div>
+                            <p>{{ comment.content }}</p>
+                            <p><small>Posted on: {{ comment.created_at }}</small></p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No comments yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function changeImage(event, src) {
+        document.getElementById('mainImage').src = src;
+        document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    $(document).on('click', '.add-to-cart', function(e) {
+        e.preventDefault();
+        var prodId = $(this).data('prod-id');
+        var prodQty = $('#quantity').val();
+
+        if (prodId) {
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'cart:cart_add' %}",
+                data: {
+                    prod_id: prodId,
+                    prod_qty: prodQty,
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    action: 'POST'
+                },
+                success: function(json) {
+                    location.reload();
+                },
+                error: function(xhr, errmsg, err) {
+                    console.error(`Error: ${xhr.status} - ${errmsg}`);
+                }
+            });
+        } else {
+            console.log("Product ID is missing");
+        }
+    });
+</script>
+
+{% endblock %}

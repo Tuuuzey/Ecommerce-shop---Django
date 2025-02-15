@@ -1,0 +1,216 @@
+{% extends 'mysite/base.html' %}
+{% load customfilters %}
+{% block content %}
+
+<style>
+.stars {
+    display: inline-block;
+    transform: scaleX(-1);
+  }
+  .stars input {
+    display: none;
+  }
+  .stars label {
+    transform: scaleX(-1);
+    font-size: 30px;
+    color: #d3d3d3;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .stars input:checked ~ label {
+    color: #ffcc00;
+  }
+  .stars label:hover,
+  .stars label:hover ~ label {
+    color: #ffcc00;
+  }
+  
+</style>
+<script>
+    document.querySelectorAll('.stars input').forEach((star) => {
+        star.addEventListener('change', function() {
+          const ratingValue = this.value;
+          const stars = document.querySelectorAll('.stars label');
+          stars.forEach((starLabel) => {
+            starLabel.style.color = '#d3d3d3';
+          });
+          for (let i = 0; i < ratingValue; i++) {
+            stars[i].style.color = '#ffcc00';
+          }
+        });
+      });
+      
+</script>
+
+{% if orders %}
+{% for order in orders %}
+<div style="background-color: #d2c9ff; min-height: calc(100vh - 6.80vh);">
+<section class="h-100 gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card" style="border-radius: 10px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <p class="lead fw-normal mb-0">Receipt</p>
+                        </div>
+
+                        {% for item in order.items.all %}
+                        <div class="card shadow-0 border mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <img src="{{ item.product.image }}" class="img-fluid" alt="{{ item.product.name }}">
+                                    </div>
+                                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                        <p class="text-muted mb-0">{{ item.product.name }}</p>
+                                    </div>
+                                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                        <p class="text-muted mb-0 small">{{ item.product.category }}</p>
+                                    </div>
+                                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                        <p class="text-muted mb-0 small">Qty: {{ item.quantity }}</p>
+                                    </div>
+                                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                        <p class="text-muted mb-0 small">${{ item.price|floatformat:2 }}</p>
+                                    </div>
+                                </div>
+                                <hr class="mb-4" style="background-color: #0d6efd; opacity: 1;">
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-md-2">
+                                        <p class="text-muted mb-0 small">Track Order</p>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="progress" style="height: 6px; border-radius: 16px;">
+                                            <div class="progress-bar" role="progressbar"
+                                                style="width: {{ order.status|percent_status }}%; border-radius: 16px; background-color: #0d6efd;" 
+                                                aria-valuenow="{{ order.status|percent_status }}" 
+                                                aria-valuemin="0" aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-around mb-1">
+                                            <p class="text-muted mt-1 mb-0 small ms-xl-5">Sent for delivery</p>
+                                            <p class="text-muted mt-1 mb-0 small ms-xl-5">Delivered</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                    <!-- Order Details and Address Section -->
+                    <div class="d-flex justify-content-between pt-2">
+                        <p class="fw-bold mb-0">Order Details</p>
+                        <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span> ${{ order.total }}</p>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-2">
+                        <p class="text-muted mb-0">Invoice Number : {{ order.transaction.id_transaction }}</p>
+                        <p class="text-muted mb-0"><span class="fw-bold me-4">Discount</span> 
+                            {% if order.promo_code %}
+                                -{{ order.promo_code.value }}%
+                            {% else %}
+                                $0.00
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <p class="text-muted mb-0">Invoice Date : {{ order.created_at|date:"d M, Y" }}</p>
+                        <p class="text-muted mb-0"><span class="fw-bold me-4">Delivery Charges</span> Free</p>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <div class="mt-4">
+                        <h5 class="text-muted">Delivery Address</h5>
+                        <p class="text-muted mb-0">{{ order.address.first_name }} {{ order.address.last_name }}</p>
+                        <p class="text-muted mb-0">{{ order.address.country }}, {{ order.address.city }} {{ order.address.state }}</p>
+                        <p class="text-muted mb-0">{{ order.address.address }}  - {{ order.address.zip }}</p>
+                        <p class="text-muted mb-0">Phone: {{ order.address.phone_number }}</p>
+                        <p class="text-muted mb-0">Email: {{ order.address.email }}</p>
+                    </div>
+
+                    <!-- Bottom-Right Buttons -->
+                    <div class="position-relative">
+                        <div class="position-absolute" style="bottom: 10px; right: 10px;">
+                            <button class="btn btn-outline-primary px-2 py-1" data-bs-toggle="modal" data-bs-target="#commentModal{{ order.id }}">Share Your Thoughts</button>
+                        </div>
+                    </div>
+
+                    <!-- Order Total Section -->
+                    <div class="card-footer border-0"
+                        style="background-color: #0d6efd; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+                        <h5 class="d-flex align-items-center justify-content-end text-white text-uppercase mb-0">Total paid: <span class="h4 mb-0 ms-2">${{ order.total }}</span></h5>
+                    </div>
+                    <!-- Modal for Comment -->
+                    <div class="modal fade" id="commentModal{{ order.id }}" tabindex="-1" aria-labelledby="commentModalLabel{{ order.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="commentModalLabel{{ order.id }}">Share Your Thoughts</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="{% url 'add_comment' %}">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label for="productSelect{{ order.id }}" class="form-label">Select Product for Comment</label>
+                                            <select class="form-select" name="product" id="productSelect{{ order.id }}" required>
+                                                {% for item in order.items.all %}
+                                                    <option value="{{ item.product.id }}">{{ item.product.name }}</option>
+                                                {% empty %}
+                                                    <option value="">No products available</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="rating{{ order.id }}" class="form-label">Rate the Product</label>
+                                            <div class="stars" id="rating{{ order.id }}">
+                                                <input type="radio" name="rating" value="1" id="star1{{ order.id }}" required> 
+                                                <label for="star1{{ order.id }}" class="star">★</label>
+                                                <input type="radio" name="rating" value="2" id="star2{{ order.id }}">
+                                                <label for="star2{{ order.id }}" class="star">★</label>
+                                                <input type="radio" name="rating" value="3" id="star3{{ order.id }}">
+                                                <label for="star3{{ order.id }}" class="star">★</label>
+                                                <input type="radio" name="rating" value="4" id="star4{{ order.id }}">
+                                                <label for="star4{{ order.id }}" class="star">★</label>
+                                                <input type="radio" name="rating" value="5" id="star5{{ order.id }}">
+                                                <label for="star5{{ order.id }}" class="star">★</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <textarea class="form-control" name="content" rows="4" placeholder="Write your comment here..." required></textarea>
+                                        </div>
+                                        
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Submit Comment</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+
+{% endfor %}
+
+{% else %}
+<div style="background-color: #d2c9ff; min-height: calc(100vh - 6.80vh);">
+    <br> <br>
+    <div class="container" style="background: #f7f7ff; border-radius: 15px; padding: 20px;">
+      <h1 style="text-align: center;">It looks like you didn't order anything yet.</h1>
+      <div class="row">
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

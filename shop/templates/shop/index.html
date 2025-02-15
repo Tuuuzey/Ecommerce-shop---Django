@@ -1,0 +1,197 @@
+{% extends 'mysite/base.html' %}
+{% block content %}
+<nav class="navbar bg-body-tertiary d-flex justify-content-between align-items-center">
+    <div class="d-flex">
+        <!-- Kategorie -->
+        <div class="dropdown me-3">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="margin-left: 3%">
+                Category
+            </button>
+            <div class="dropdown-menu p-3" style="min-width: 800px;">
+                <div class="row">
+                    <div class="col-4">
+                        <a class="dropdown-item text-nowrap" href="?{% if product_search %}searchbtn={{ product_search }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}">All Categories</a>
+                    </div>
+                </div>
+                <div class="row">
+                    {% for key, value in categories.items %}
+                        <div class="col-4">
+                            <a class="dropdown-item text-nowrap" href="?category={{ key }}{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ value }}</a>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <a class="dropdown-item text-nowrap">No categories available</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="dropdown me-3">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Sort By
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="?sort=price_asc{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">
+                        Price: Low to High
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="?sort=price_desc{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">
+                        Price: High to Low
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="?sort=rating{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">
+                        Average Rating
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="?sort=comments{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">
+                        Number of Comments
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <form class="d-flex align-items-center" role="search" method="get">
+        {% csrf_token %}
+        <input class="form-control me-2" type="search" name="searchbtn" placeholder="Search" aria-label="Search" value="{{ product_search }}">
+        {% if request.GET.category %}
+            <input type="hidden" name="category" value="{{ request.GET.category }}">
+        {% endif %}
+        {% if request.GET.sort %}
+            <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+        {% endif %}
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+</nav>
+
+<script>
+    setTimeout(function() {
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 3000);
+</script>
+
+<div class="container">
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3">
+            <br>
+            <div class="card">
+                <img src="{{ product.image }}" width="230px" height="280px" class="card-img-top">
+                <div class="card-body">
+                    <div class="card-title" style="font-size: larger; font-weight: 600;">
+                        {{ product.name }}
+                    </div>
+                    {% if product.discount_price %}
+                        <div class="card-text">
+                            <s style="color: gray; font-size: large;">${{ product.price|floatformat:2 }}</s>
+                            <span style="color: green; font-size: large;">${{ product.discount_price|floatformat:2 }}</span>
+                        </div>
+                    {% else %}
+                        <div class="card-text" style="color: green; font-size: large;">
+                            ${{ product.price|floatformat:2 }}
+                        </div>
+                    {% endif %}
+                    <div style="text-align: center;">
+                        <a href="/{{ product.id }}" class="btn btn-primary">Detail</a>
+                        <button type="button" class="btn atc btn-primary add-to-cart" data-prod-id="{{ product.id }}" data-prod-qty="1">Add to cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- PAGINACJA -->
+<div class="d-flex flex-column justify-content-end align-items-center">
+    <br><br><br><br>
+    {% if products %}
+        {% if products.has_other_pages %}
+        <div class="py-2 px-4 text-bg-dark border border-secondary rounded-pill mb-3" style="width: 350px;">
+            <nav aria-label="Page navigation example" data-bs-theme="dark">
+                <ul class="pagination justify-content-center">
+                    <!-- Link do pierwszej strony -->
+                    {% if products.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">1</a>
+                        </li>
+                        {% if products.number != 2 %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ products.previous_page_number }}{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                                    {{ products.previous_page_number }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <!-- Aktualna strona -->
+                    <li class="page-item active">
+                        <a class="page-link" aria-current="page">{{ products.number }}</a>
+                    </li>
+                    
+                    <!-- Link do następnej strony -->
+                    {% if products.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.next_page_number }}{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                                {{ products.next_page_number }}
+                            </a>
+                        </li>
+                        {% if products.number != products.paginator.num_pages|add:"-1" %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ products.paginator.num_pages }}{% if product_search %}&searchbtn={{ product_search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                                    {{ products.paginator.num_pages }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    {% else %}
+        <h3><p>No results found for: {{ product_search }}</p></h3>
+        <h5><p>Check the spelling or try using more general terms.</p></h5>
+        <h5><p>Browse each product page to explore other purchasing options.</p></h5>
+    {% endif %}
+</div>
+
+<script>
+    $(document).on('click', '.add-to-cart', function(e) {
+        e.preventDefault();
+        var prodId = $(this).data('prod-id');
+        var prodQty = $(this).data('prod-qty');
+    
+        if (prodId) {
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'cart:cart_add' %}",
+                data: {
+                    prod_id: prodId,
+                    prod_qty: prodQty,
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    action: 'POST'
+                },
+                success: function(json) {
+                    location.reload();
+                },
+                error: function(xhr, errmsg, err) {
+                    console.error(`Błąd: ${xhr.status} - ${errmsg}`);
+                }
+            });
+        } else {
+            console.log("Produkt ID jest brakujące");
+        }
+    });
+</script>
+
+{% endblock %}
