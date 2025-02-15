@@ -1,0 +1,116 @@
+{% extends 'mysite\base.html' %} 
+{% block content %}
+<style>
+    .cart {
+        border: 0 solid transparent;
+        border-radius: .25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 6px 0 rgb(218 218 253 / 65%), 0 2px 6px 0 rgb(206 206 238 / 54%);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .cart-wrap {
+        border-radius: 15px;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .table {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .img-product img {
+        border-radius: 10px;
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+    }
+
+    .btn-danger {
+        border-radius: 10px;
+    }
+
+    .in-stock-box {
+        padding: 5px 10px;
+        border-radius: 10px;
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    a:hover {
+        color: #4a4a4a;
+    }
+</style>
+
+<div style="background-color: #d2c9ff; min-height: calc(100vh - 6.80vh);"> <br> <br>
+<div class="cart-wrap"> <br> <br>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                {% if wishlist.products.all %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Product</th>
+                                <th scope="col" style="text-align: center;">Price</th>
+                                <th scope="col" style="text-align: center;">Stock Status</th>
+                                <th scope="col" style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prod in wishlist.products.all %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <a href="/{{ prod.id }}" class="d-flex align-items-center">
+                                            <div class="img-product">
+                                                <img src="{{ prod.image }}" alt="{{ prod.name }}" class="mCS_img_loaded" width="20%" height="20%">
+                                            </div>
+                                            <strong> | &nbsp; &nbsp; {{ prod.name }}</strong>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;"> <br>  <br>
+                                    {% if prod.discount_price is not None %}
+                                        <div>
+                                            <s class="text-muted fs-6">${{ prod.price|floatformat:2 }}</s>
+                                            <span class="text-success fs-5">${{ prod.discount_price|floatformat:2 }}</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="text-success fs-5">${{ prod.price|floatformat:2 }}</div>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;"> <br>  <br>
+                                    <span class="in-stock-box">{% if prod.stock is True %}In Stock{% else %}Out of Stock{% endif %}</span>
+                                </td>
+                                <td class="text-center"> <br>  <br>
+                                    <a href="{% url 'wishlist:remove_from_wishlist' prod.id %}" class="btn btn-danger btn-sm">Remove from wishlist</a>
+                                </td>
+                            </tr>
+                            <tr><td colspan="4"><hr class="mb-4"></td></tr> 
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div style="text-align: center;">
+                        <h1>Your wishlist is empty</h1>
+                        <br>
+                        <h3>Go to product details to add to wishlist</h3> <br>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
